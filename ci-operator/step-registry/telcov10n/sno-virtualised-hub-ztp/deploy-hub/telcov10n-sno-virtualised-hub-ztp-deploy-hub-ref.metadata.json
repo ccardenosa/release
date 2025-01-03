@@ -1,0 +1,11 @@
+{
+	"path": "telcov10n/sno-virtualised-hub-ztp/deploy-hub/telcov10n-sno-virtualised-hub-ztp-deploy-hub-ref.yaml",
+	"owners": {
+		"approvers": [
+			"natifridman",
+			"shaior",
+			"ccardenosa",
+			"cplacani"
+		]
+	}
+}
