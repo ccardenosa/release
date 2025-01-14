@@ -46,6 +46,35 @@ EOF
   set +x
 }
 
+##############################################################################################################
+# Test results
+##############################################################################################################
+
+function run_pytest {
+  test_name=$1
+  test_results_xml_output=${ARTIFACT_DIR}/junit_${test_name}-test-results.xml
+  pytest ${PYTEST_VERBOSITY} ${tc_file} --junitxml=${test_results_xml_output}
+}
+
+function test_deployment_and_services {
+
+  echo "************ telcov10n-spoke Generate Test results ************"
+
+  tc_file="/tmp/pytest-tc.py"
+  cat << EOF >| ${tc_file}
+import os
+import time
+import requests
+import pytest
+
+def test_cluster_operators(bash):
+  oc_cmd = f"oc get co --no-headers | grep -v 'True .* False .* False' | wc -l"
+  assert "0" in bash.run_script_inline([oc_cmd])
+EOF
+
+  run_pytest check_spoke_installation
+}
+
 function test_spoke_cluster_repo {
 
   echo "************ telcov10n Clone and verify spoke_cluster repo ************"
@@ -82,6 +111,7 @@ function test_spoke_deployment {
   set +x
 
   test_spoke_cluster_repo
+  test_deployment_and_services
 
   echo
   echo "Success!!! spoke_cluster has been deployed correctly."
