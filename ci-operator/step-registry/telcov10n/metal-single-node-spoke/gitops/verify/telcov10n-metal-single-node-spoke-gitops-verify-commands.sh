@@ -38,11 +38,26 @@ function wait_for_argocd_apps {
 }
   # oc -n openshift-gitops wait apps/policies --for=jsonpath='{.status.health.status}'=Healthy --timeout 30m &&
 
+function wait_for_managedcluster {
+
+  echo "************ telcov10n Check Gitops service: Wait until managedcluster object is created ************"
+
+  if [ -f "${SHARED_DIR}/spoke_cluster_name" ]; then
+    SPOKE_CLUSTER_NAME="$(cat ${SHARED_DIR}/spoke_cluster_name)"
+  else
+    SPOKE_CLUSTER_NAME=${NAMESPACE}
+  fi
+
+  wait_until_command_is_ok "oc get managedcluster | grep -w '${SPOKE_CLUSTER_NAME}'" 10s 100 && \
+  wait_until_command_is_ok "oc get ns | grep -w '${SPOKE_CLUSTER_NAME}'" 10s 100
+}
+
 function test_gitops_deployment {
 
   echo "************ telcov10n Check Gitops service ************"
 
   wait_for_argocd_apps
+  wait_for_managedcluster
 }
 
 function main {
